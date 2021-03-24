@@ -15,7 +15,7 @@ type DatabaseService interface {
 	CreateUser(name, email string)
 	DeleteUser(id int)
 	GetUsers() []User
-	UpdateUser(name, key, value string)
+	UpdateUser(id, key, value string)
 }
 
 func InitDb() {
