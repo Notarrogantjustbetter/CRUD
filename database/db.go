@@ -14,7 +14,7 @@ type User struct {
 type DatabaseService interface {
 	CreateUser(name, email string)
 	DeleteUser(id int)
-	GetUsers()
+	GetUsers() []User
 	UpdateUser(name, key, value string)
 }
 
