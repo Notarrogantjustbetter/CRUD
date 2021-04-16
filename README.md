@@ -14,4 +14,4 @@
 
 # Info
 
-* This is a simple project to demonstrate CRUD using Go for back-end programming language, html & css for front-end and postgres for database with gorm(ORM library for GoLang).
+* This is a simple CRUD(Create, Read, Update, Delete) project.Using gorm(ORM library for Golang) to demonstrate basic skills in databases.
