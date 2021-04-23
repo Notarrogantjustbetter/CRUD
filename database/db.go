@@ -1,9 +1,8 @@
 package database
 
-import (
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
-)
+import "gorm.io/gorm"
+
+type PostgresDB struct {}
 
 type User struct {
 	gorm.Model
@@ -12,57 +11,39 @@ type User struct {
 }
 
 type DatabaseService interface {
-	CreateUser(name, email string)
-	DeleteUser(id string)
+	CreateSchema()
+	CreateUser(name, email string) (*User, error)
+	DeleteUser(id string) (*User, error)
+	UpdateUser(id, key, value string) (*User, error)
 	GetUsers() []User
-	UpdateUser(id, key, value string)
 }
 
-func InitDb() {
-	dsn := "host=localhost user=postgres dbname=postgres password=1234 port=5432"
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-	if err != nil {
-		panic(err)
-	}
-	db.AutoMigrate(&User{})
+func (p PostgresDB) CreateSchema() {
+	connDb := ConnectDb()
+	connDb.AutoMigrate(&User{})
 }
 
-func (u User) CreateUser(name, email string) {
-	dsn := "host=localhost user=postgres dbname=postgres password=1234 port=5432"
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-	if err != nil {
-		panic(err)
-	}
-	u.Name = name
-	u.Email = email
-	db.Create(&User{Name: u.Name, Email: u.Email})
+func (p PostgresDB) CreateUser(name, email string) (*User, error) {
+	db := ConnectDb()
+	db.Create(&User{Name: name, Email: email})
+	return &User{}, nil
 }
 
-func (u User) DeleteUser(id string) {
-	dsn := "host=localhost user=postgres dbname=postgres password=1234 port=5432"
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-	if err != nil {
-		panic(err)
-	}
+func (p PostgresDB) DeleteUser(id string) (*User, error) {
+	db := ConnectDb()
 	db.Delete(&User{}, id)
+	return &User{}, nil
 }
 
-func (u User) GetUsers() []User {
-	dsn := "host=localhost user=postgres dbname=postgres password=1234 port=5432"
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-	if err != nil {
-		panic(err)
-	}
+func (p PostgresDB) UpdateUser(id, key, value string) (*User, error) {
+	db := ConnectDb()
+	db.Model(&User{}).Where("id = ?", id).Update(key, value)
+	return &User{}, nil
+}
+
+func (p PostgresDB) GetUsers() []User {
+	db := ConnectDb()
 	var user []User
 	db.Find(&user)
 	return user
-}
-
-func (u User) UpdateUser(id, key, value string) {
-	dsn := "host=localhost user=postgres dbname=postgres password=1234 port=5432"
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-	if err != nil {
-		panic(err)
-	}
-	db.Model(&User{}).Where("id = ?", id).Update(key, value)
 }
