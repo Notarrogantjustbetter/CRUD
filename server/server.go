@@ -8,58 +8,72 @@ import (
 	"github.com/gorilla/mux"
 )
 
-
 type Server struct {
 	router *mux.Router
 }
 
-func InitServer() *mux.Router {
-	s := &Server{
+func (s Server) InitServer() *mux.Router {
+	myServer := &Server{
 		router: mux.NewRouter(),
 	}
-	s.routes()
-	return s.router
+	myServer.routes()
+	return myServer.router
 }
 
 func (s Server) routes() {
-	s.router.HandleFunc("/", homeHandler().ServeHTTP).Methods("GET", "POST")
-	s.router.HandleFunc("/users", getUsersHandler().ServeHTTP).Methods("GET")
-	s.router.HandleFunc("/updateUser", updateUserHandler().ServeHTTP).Methods("GET", "POST")
-	s.router.HandleFunc("/deleteUser", deleteUserHandler().ServeHTTP).Methods("GET", "POST")
+	s.router.HandleFunc("/", s.homeHandler().ServeHTTP).Methods("GET", "POST")
+	s.router.HandleFunc("/deleteUser", s.deleteUserHandler().ServeHTTP).Methods("GET", "POST")
+	s.router.HandleFunc("/updateUser", s.updateUserHandler().ServeHTTP).Methods("GET", "POST")
+	s.router.HandleFunc("/getUsers", s.getUsersHandler().ServeHTTP).Methods("GET")
 }
 
-func homeHandler() http.HandlerFunc {
+func (s Server) homeHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		r.ParseForm()
-		name := r.PostForm.Get("Name")
-		email := r.PostForm.Get("Email")
-		database.User{}.CreateUser(name, email)
-		utils.ExecuteTemplate(w, "home.html", nil)
+		switch r.Method {
+		case "GET":
+			utils.ExecuteTemplate(w, "home.html", nil)
+		case "POST":
+			r.ParseForm()
+			name := r.PostForm.Get("Name")
+			email := r.PostForm.Get("Email")
+			database.PostgresDB{}.CreateUser(name, email)
+			http.Redirect(w, r, "/", http.StatusFound)
+		}
 	}
 }
 
-func getUsersHandler() http.HandlerFunc {
+func (s Server) deleteUserHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		utils.ExecuteTemplate(w, "users.html", database.User{}.GetUsers())
+		switch r.Method {
+		case "GET":
+			utils.ExecuteTemplate(w, "deleteUser.html", nil)
+		case "POST":
+			r.ParseForm()
+			id := r.PostForm.Get("ID")
+			database.PostgresDB{}.DeleteUser(id)
+			http.Redirect(w, r, "/", http.StatusFound)
+		}
 	}
 }
 
-func updateUserHandler() http.HandlerFunc {
+func (s Server) updateUserHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		r.ParseForm()
-		id := r.PostForm.Get("ID")
-		key := r.PostForm.Get("Key")
-		value := r.PostForm.Get("Value")
-		database.User{}.UpdateUser(id, key, value)
-		utils.ExecuteTemplate(w, "updateUser.html", nil)
+		switch r.Method {
+		case "GET":
+			utils.ExecuteTemplate(w, "updateUser.html", nil)
+		case "POST":
+			r.ParseForm()
+			id := r.PostForm.Get("ID")
+			key := r.PostForm.Get("Key")
+			value := r.PostForm.Get("Value")
+			database.PostgresDB{}.UpdateUser(id, key, value)
+			http.Redirect(w, r, "/", http.StatusFound)
+		}
 	}
 }
 
-func deleteUserHandler() http.HandlerFunc {
+func (s Server) getUsersHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		r.ParseForm()
-		id := r.PostForm.Get("ID")
-		database.User{}.DeleteUser(id)
-		utils.ExecuteTemplate(w, "deleteUser.html", nil)
+		utils.ExecuteTemplate(w, "users.html", database.PostgresDB{}.GetUsers())
 	}
 }
