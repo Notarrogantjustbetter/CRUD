@@ -4,14 +4,14 @@ import (
 	"net/http"
 
 	"github.com/Notarrogantjustbetter/CRUD/v2/database"
-	"github.com/Notarrogantjustbetter/CRUD/v2/server"
+	"github.com/Notarrogantjustbetter/CRUD/v2/routes"
 	"github.com/Notarrogantjustbetter/CRUD/v2/utils"
 )
 
 
 func main() {
 	utils.LoadTemplate()
-	database.InitDb()
-	router := server.InitServer()
+	database.OpenDb()
+	router := routes.InitRouter()
 	http.ListenAndServe(":8080", router)
 }
