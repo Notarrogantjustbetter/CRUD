@@ -5,6 +5,6 @@
 <body>
     <h3>Users: </h3>
     {{ range. }}
-    <div>{{ . }}</div>
+    <div>ID: {{ .ID }} Name: {{ .Name }} Email: {{ .Email }}</div>
     {{ end }}
 </body>
