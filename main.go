@@ -11,7 +11,8 @@ import (
 
 func main() {
 	utils.LoadTemplate()
-	database.OpenDb()
+	database.SetDbEnv()
+	database.ConnectDb()
 	router := routes.InitRouter()
 	http.ListenAndServe(":8080", router)
 }
