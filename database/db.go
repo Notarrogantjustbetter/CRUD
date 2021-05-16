@@ -2,28 +2,39 @@ package database
 
 import (
 	"fmt"
+	"os"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-const (
-	host = "localhost"
-	user = "crud"
-	dbname = "postgres"
-	password = 1234
-	port = 5432
-)
-
 type User struct {
 	gorm.Model
 	Name string
-	Email string
+}
+
+type PostgresDb struct {
+	DB *gorm.DB
+}
+
+type DatabaseService interface {
+	CreateUser(user *User) error
+	DeleteUser(user *User) error
+	UpdateUser(user *User) error
+	GetAllUsers()([]User, error)
+}
+
+func SetDbEnv() {
+	os.Setenv("DB_HOST", "localhost")
+	os.Setenv("DB_USER", "crud")
+	os.Setenv("DB_DBNAME", "postgres")
+	os.Setenv("DB_PASSWORD", "1234")
+	os.Setenv("DB_PORT", "5432")
 }
 
 
-func OpenDb() *gorm.DB {
-	dsn := fmt.Sprintf("host=%s user=%s dbname=%s password=%d port=%d", host, user, dbname, password, port)
+func ConnectDb() *gorm.DB {
+	dsn := fmt.Sprintf("host=%s user=%s dbname=%s password=%s port=%s",os.Getenv("DB_HOST"), os.Getenv("DB_USER"), os.Getenv("DB_DBNAME"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_PORT"))
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic(err)
@@ -32,24 +43,27 @@ func OpenDb() *gorm.DB {
 	return db
 }
 
-func CreateUser(name, email string) error {
-	db := OpenDb()
-	return db.Create(&User{Name: name, Email: email}).Error
+func (p PostgresDb) CreateUser(user *User) error {
+	p.DB = ConnectDb()
+	p.DB.Create(&User{Name: user.Name})
+	return nil
 }
 
-func DeleteUser(id string) error {
-	db := OpenDb()
-	return db.Delete(&User{}, id).Error
+func (p PostgresDb) DeleteUser(user *User) error {
+	p.DB = ConnectDb()
+	p.DB.Delete(&User{}, user.ID)
+	return nil
 }
 
-func UpdateUser(id, key, value string) error {
-	db := OpenDb()
-	return db.Model(&User{}).Where("id = ?", id).Update(key, value).Error
+func (p PostgresDb) UpdateUser(user *User) error {
+	p.DB = ConnectDb()
+	p.DB.Model(&User{}).Where("id = ?", user.ID).Update("Name", user.Name)
+	return nil
 }
 
-func GetUsers() []User {
-	db := OpenDb()
+func (p PostgresDb) GetAllUsers()([]User, error) {
+	p.DB = ConnectDb()
 	var user []User
-	db.Find(&user)
-	return user
+	p.DB.Find(&user)
+	return user, nil
 }
