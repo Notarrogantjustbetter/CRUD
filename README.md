@@ -14,4 +14,4 @@
 
 # Info
 
-* This is a simple CRUD(Create, Read, Update, Delete) project using gorm(ORM library for Golang).
+* Simple CRUD(Create, Read, Update, Delete) project with Golang and gorm(ORM library).
