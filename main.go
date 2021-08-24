@@ -3,9 +3,9 @@ package main
 import (
 	"net/http"
 
-	"github.com/Notarrogantjustbetter/CRUD/v2/database"
-	"github.com/Notarrogantjustbetter/CRUD/v2/routes"
-	"github.com/Notarrogantjustbetter/CRUD/v2/utils"
+	"github.com/Deikioveca/CRUD/v2/database"
+	"github.com/Deikioveca/CRUD/v2/routes"
+	"github.com/Deikioveca/CRUD/v2/utils"
 )
 
 
