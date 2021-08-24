@@ -1,4 +1,4 @@
-module github.com/Notarrogantjustbetter/CRUD/v2
+module github.com/Deikioveca/CRUD/v2
 
 go 1.16
 
