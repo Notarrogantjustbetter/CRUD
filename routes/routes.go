@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/Notarrogantjustbetter/CRUD/v2/database"
-	"github.com/Notarrogantjustbetter/CRUD/v2/utils"
+	"github.com/Deikioveca/CRUD/v2/database"
+	"github.com/Deikioveca/CRUD/v2/utils"
 	"github.com/gorilla/mux"
 )
 
